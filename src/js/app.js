@@ -4,7 +4,7 @@ new Vue({
     el: 'body',
 
     ready: function() {
-        alert("Vuejs setup now working");
+        
     }
 
 });

@@ -10001,9 +10001,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 new _vue2.default({
     el: 'body',
 
-    ready: function ready() {
-        alert("Vuejs setup now working");
-    }
+    ready: function ready() {}
 
 });
 
