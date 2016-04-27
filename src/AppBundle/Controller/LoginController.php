@@ -5,7 +5,6 @@ namespace AppBundle\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Response;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 
 use Symfony\Component\HttpFoundation\Request;
 
@@ -15,10 +14,10 @@ class LoginController extends Controller
 	 /**
      * @Route("/login", name="login")
      */
-    public function loginAction(Request $request)
+    public function loginAction()
     {
         if ($this->getUser()) {
-            // we have logged in, redirect to the homepage
+            // User is logged in, redirect to the homepage
             return $this->redirectToRoute('homepage');
         }
 
@@ -36,5 +35,19 @@ class LoginController extends Controller
                 'error'         => $error,
             )
         );
+    }
+
+    /**
+     * @Route("/logout", name="logout")
+     */
+    public function logout(Request $request)
+    {
+        if ($this->getUser()) {
+            // user is logged in, destroy session and redirect to the logout
+            $session =$request->getSession();
+            $session->clear();
+
+            return $this->redirectToRoute('homepage');
+        }
     }
 }

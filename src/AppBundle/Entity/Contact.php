@@ -11,7 +11,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Entity(repositoryClass="ContactRepository")
  */
 
-class Contact
+class Contact implements \Serializable
 {
     /**
      * @ORM\Column(type="integer")
@@ -133,22 +133,6 @@ class Contact
     }
 
     /**
-     * @return mixed
-     */
-    public function getDepartment()
-    {
-        return $this->department;
-    }
-
-    /**
-     * @param mixed $department
-     */
-    public function setDepartment($department)
-    {
-        $this->department = $department;
-    }
-
-    /**
      * @return \DateTime
      */
     public function getDob()
@@ -264,6 +248,28 @@ class Contact
     public function getActivities()
     {
         return $this->activities;
+    }
+
+    /** @see \Serializable::serialize() */
+    public function serialize()
+    {
+        return serialize([
+            $this->id,
+            $this->email,
+            $this->firstName,
+            $this->lastName
+        ]);
+    }
+
+    /** @see \Serializable::unserialize() */
+    public function unserialize($serialized)
+    {
+        list (
+            $this->id,
+            $this->email,
+            $this->firstName,
+            $this->lastName,
+            ) = unserialize($serialized);
     }
 
     public function __toString()

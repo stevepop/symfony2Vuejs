@@ -1,56 +1,107 @@
 {% extends 'layout.html.twig' %}
 
 {% block body %}
-    <div class="container">
-        <div class="row">
-            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xs-offset-0 col-sm-offset-0 col-md-offset-3 col-lg-offset-3 toppad" >
-
-                <h1 class="profile-heading">Your Profile</h1>
-                <div class="panel panel-info">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">{{ contact.getFirstName()  }} {{ contact.getLastName()  }}</h3>
+    <div class="contact-page">
+        <h1 class="profile-heading">Contact Data</h1>
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <h3 class="panel-title">{{ contact.getFirstName()  }} {{ contact.getLastName()  }}</h3>
+            </div>
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-md-3 col-lg-3 " align="center">
+                        <img alt="{{ contact.getfirstName() }}" src="/images/uploads/contact-{{ contact.getId() }}.png" class="img-circle img-responsive">
                     </div>
-                    <div class="panel-body">
-                        <div class="row">
-                            <div class="col-md-3 col-lg-3 " align="center"> <img alt="User Pic" src="http://babyinfoforyou.com/wp-content/uploads/2014/10/avatar-300x300.png" class="img-circle img-responsive"> </div>
 
-                            <div class=" col-md-9 col-lg-9 ">
-                                <table class="table table-user-information">
-                                    <tbody>
-                                    <tr>
-                                        <td>Date of Birth</td>
-                                        <td>01/24/1988</td>
-                                    </tr>
+                    <div class=" col-md-9 col-lg-9 ">
+                        <table class="table table-user-information">
+                            <tbody>
+                            <tr>
+                                <td>Date of Birth</td>
+                                <td>{{ contact.getDob().format('d-m-Y') }}</td>
+                            </tr>
+                            <tr>
+                            <tr>
+                                <td>Home Address</td>
+                                <td>{{ contact.getHomeAddress() }}</td>
+                            </tr>
+                            <tr>
+                                <td>Email</td>
+                                <td><a href="mailto:{{ contact.getEmail() }}">{{ contact.getEmail() }}</a></td>
+                            </tr>
+                            <tr>
+                                <td>Phone Number</td>
+                                <td>{{ contact.getPhone() }}(Landline)<br><br>{{ contact.getMobile() }} (Mobile)</td>
+                            </tr>
 
-                                    <tr>
-                                    <tr>
-                                        <td>Gender</td>
-                                        <td>Male</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Home Address</td>
-                                        <td>Metro Manila,Philippines</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Email</td>
-                                        <td><a href="mailto:info@support.com">info@support.com</a></td>
-                                    </tr>
-                                    <td>Phone Number</td>
-                                    <td>123-4567-890(Landline)<br><br>555-4567-890(Mobile)
-                                    </td>
+                            </tbody>
+                        </table>
 
-                                    </tr>
-
-                                    </tbody>
-                                </table>
-
-                                <a href="#" class="btn btn-primary">Edit profile</a>
-                                <a href="#" class="btn btn-primary">My Activity</a>
-                            </div>
-                        </div>
+                        <a href="" @click.prevent="showForm" class="btn btn-primary">Edit profile</a>
+                        <a href="" @click.prevent="showActivity" class="btn btn-primary">
+                            Show Activities
+                        </a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <hr>
+
+    <div class="activities" v-if="displayActivities == true">
+        <activity></activity>
+    </div>
+
+    <template id="activity">
+        Add Activity: <input type="text" name="activity" v-model="activity">
+        <button type="submit" name="add-activity" @click.prevent="addActivity(activity)">Add</button>
+        <ul class="list-group">
+            <li class="list-group-item" v-for="activity in activities">
+                {% verbatim %}{{ activity.name }}{% endverbatim %}
+
+                <strong @click.prevent="deleteActivity(activity)">&times;</strong>
+
+            </li>
+        </ul>
+    </template>
+
+    <div class="edit-contact" v-if="displayform == true">
+        <hr>
+        <h4>Edit Contact</h4>
+        <form>
+            <fieldset class="form-group">
+                <label for="first_name">First name</label>
+                <input type="text" class="form-control" id="first_name" placeholder="Enter First name">
+            </fieldset>
+
+            <fieldset class="form-group">
+                <label for="last_name">Last name</label>
+                <input type="text" class="form-control" id="last_name" placeholder="Enter Last name">
+            </fieldset>
+
+            <fieldset class="form-group">
+                <label for="email">Email address</label>
+                <input type="email" class="form-control" id="email" placeholder="Enter email">
+            </fieldset>
+
+            <fieldset class="form-group">
+                <label for="phone">Phone number</label>
+                <input type="text" class="form-control" id="email" placeholder="Enter phone number">
+            </fieldset>
+
+            <fieldset class="form-group">
+                <label for="mobile">Mobile number</label>
+                <input type="text" class="form-control" id="email" placeholder="Enter mobile number">
+            </fieldset>
+
+            <fieldset class="form-group">
+                <label for="address">Address</label>
+                <textarea class="form-control" id="address" rows="3"></textarea>
+            </fieldset>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
+
 {% endblock %}
+

@@ -31,8 +31,8 @@
         </div>
         <div id="navbar" class="collapse navbar-collapse">
             <ul class="nav navbar-nav">
-                <li><a href="#">Home</a></li>
-                <li class="active"><a href="#about">Profile</a></li>
+                <li><a href="/">Home</a></li>
+                {% if (app.user) %}<li><a href="/logout">Logout</a></li> {% endif %}
             </ul>
         </div><!--/.nav-collapse -->
     </div>
@@ -41,7 +41,16 @@
 <div class="container">
 
     <div class="app">
-        {% block body %}{% endblock %}
+        <div class="container">
+            <div class="row">
+                <div class="col-md-8 col-md-offset-2">
+                    <h1 class="page-title">Vue.js Symfony Sandbox</h1>
+                    <hr>
+                    {% if (app.user) %}<h2 class="welcome">Hi {{ app.user.getFirstname() }}!</h2>{% endif %}
+                    {% block body %}{% endblock %}
+                </div>
+            </div>
+        </div>
     </div>
 </div><!-- /.container -->
 
