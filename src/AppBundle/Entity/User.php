@@ -3,175 +3,289 @@
 namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Security\Core\User\AdvancedUserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * @ORM\Entity
- * @ORM\Table(name="users")
+ * @ORM\Table(name="user")
+ * @ORM\Entity(repositoryClass="UserRepository")
+ * @UniqueEntity(fields="email", message="Email already taken")
  */
-class User
+class User implements AdvancedUserInterface, \Serializable
 {
     /**
-     * @ORM\Column(type="integer")
      * @ORM\Id
+     * @ORM\Column(type="integer", options={"unsigned":true})
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
 
     /**
-     * @var string
-     *
-     * @ORM\Column(type="text", nullable=true, name="first_name")
-     */
-    private $firstName;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(type="text", nullable=true, name="last_name")
-     */
-    private $lastName;
-
-    /**
-     * @var \AppBundle\Entity\Department
-     *
-     *
-     * @ORM\ManyToOne(targetEntity="Department", inversedBy="user")
-     * @ORM\JoinColumn(name="dept_id", referencedColumnName="id")
-     */
-    private $department;
-
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(type="date", nullable=false, name="dob")
-     */
-    private $dob;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(type="text", nullable=true, name="home_address")
-     */
-    private $homeAddress;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(type="text", nullable=true, name="email")
+     * @ORM\Column(type="string", length=255, unique=true)
+     * @Assert\NotBlank(message="Please tell me your email address")
+     * @Assert\Email()
      */
     private $email;
 
     /**
-     * @var string
-     *
-     * @ORM\Column(type="text", nullable=true, name="mobile")
+     * @ORM\Column(type="string", length=100)
      */
-    private $mobile;
+    private $password;
 
     /**
-     * @var string
-     *
-     * @ORM\Column(type="text", nullable=true, name="phone")
+     * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank(message="Please tell me your first name")
+     * @Assert\Length(max=255)
      */
-    private $phone;
+    private $first_name;
 
     /**
-     * @return mixed
+     * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank(message="Please tell me your last name")
+     * @Assert\Length(max=255)
+     */
+    private $last_name;
+
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $enabled;
+
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $activated;
+
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $admin_status;
+
+    public function __construct()
+    {
+        // a couple of default for new users
+        $this->enabled      = true;
+        $this->activated    = false;
+        $this->admin_status = false;
+    }
+
+    /**
+     * Get id
+     *
+     * @return integer
      */
     public function getId()
     {
         return $this->id;
     }
 
-    /**
-     * @param mixed $id
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getFirstName()
-    {
-        return $this->firstName;
-    }
-
-    /**
-     * @param mixed $firstName
-     */
-    public function setFirstName($firstName)
-    {
-        $this->firstName = $firstName;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getLastName()
-    {
-        return $this->lastName;
-    }
-
-    /**
-     * @param mixed $lastName
-     */
-    public function setLastName($lastName)
-    {
-        $this->lastName = $lastName;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getDepartment()
-    {
-        return $this->department;
-    }
-
-    /**
-     * @param mixed $department
-     */
-    public function setDepartment($department)
-    {
-        $this->department = $department;
-    }
-
-    /**
-     * @return \DateTime
-     */
-    public function getDob()
-    {
-        return $this->dob;
-    }
-
-    /**
-     * @param \DateTime $dob
-     */
-    public function setDob($dob)
-    {
-        $this->dob = $dob;
-    }
 
     /**
      * @return string
      */
-    public function getHomeAddress()
+    public function getPassword()
     {
-        return $this->homeAddress;
+        return $this->password;
     }
 
     /**
-     * @param string $homeAddress
+     * Set password
+     *
+     * @param string $password
+     *
+     * @return User
      */
-    public function setHomeAddress($homeAddress)
+    public function setPassword($password)
     {
-        $this->homeAddress = $homeAddress;
+        $this->password = $password;
+
+        return $this;
     }
 
     /**
+     * @return null
+     */
+    public function getUsername()
+    {
+        $username = $this->getFullName();
+        if (empty($username)) {
+            $username = 'Unnamed User';
+        }
+        return $username;
+    }
+
+    /**
+     * @return null
+     */
+    public function getSalt()
+    {
+        return null;
+    }
+
+    /**
+     * @return bool
+     */
+    public function eraseCredentials()
+    {
+        return true;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAccountNonExpired()
+    {
+        return true;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAccountNonLocked()
+    {
+        return true;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isCredentialsNonExpired()
+    {
+        return true;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isEnabled()
+    {
+        return (bool) $this->enabled;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasActivated()
+    {
+        return (bool) $this->activated;
+    }
+
+    /** @see \Serializable::serialize() */
+    public function serialize()
+    {
+        return serialize([
+            $this->id,
+            $this->email,
+            $this->password,
+            $this->first_name,
+            $this->last_name,
+        ]);
+    }
+
+    /** @see \Serializable::unserialize() */
+    public function unserialize($serialized)
+    {
+        list (
+            $this->id,
+            $this->email,
+            $this->password,
+            $this->first_name,
+            $this->last_name,
+            ) = unserialize($serialized);
+    }
+
+    /**
+     * @return array
+     */
+    public function getRoles()
+    {
+        $roles = [];
+
+        if ($this->getAdminStatus()) {
+            $roles[] = 'ROLE_ADMIN';
+        } else {
+            $roles[] = 'ROLE_USER';
+        }
+
+        return $roles;
+    }
+
+    /**
+     * Set firstName
+     *
+     * @param string $firstName
+     *
+     * @return User
+     */
+    public function setFirstName($firstName)
+    {
+        $this->first_name = $firstName;
+
+        return $this;
+    }
+
+    /**
+     * Get firstName
+     *
+     * @return string
+     */
+    public function getFirstName()
+    {
+        return $this->first_name;
+    }
+
+    /**
+     * Set lastName
+     *
+     * @param string $lastName
+     *
+     * @return User
+     */
+    public function setLastName($lastName)
+    {
+        $this->last_name = $lastName;
+
+        return $this;
+    }
+
+    /**
+     * Get lastName
+     *
+     * @return string
+     */
+    public function getLastName()
+    {
+        return $this->last_name;
+    }
+
+    /**
+     * Get full name (first_name last_name)
+     *
+     * @return string
+     */
+    public function getFullName()
+    {
+        return trim(sprintf('%s %s', $this->getFirstName(), $this->getLastName()));
+    }
+
+    /**
+     * Set email
+     *
+     * @param string $email
+     *
+     * @return User
+     */
+    public function setEmail($email)
+    {
+        $this->email = $email;
+
+        return $this;
+    }
+
+    /**
+     * Get email
+     *
      * @return string
      */
     public function getEmail()
@@ -180,52 +294,75 @@ class User
     }
 
     /**
-     * @param string $email
+     * Set enabled
+     *
+     * @param boolean $enabled
+     *
+     * @return User
      */
-    public function setEmail($email)
+    public function setEnabled($enabled)
     {
-        $this->email = $email;
+        $this->enabled = (bool) $enabled;
+
+        return $this;
     }
 
     /**
-     * @return string
+     * Get enabled
+     *
+     * @return boolean
      */
-    public function getMobile()
+    public function getEnabled()
     {
-        return $this->mobile;
+        return (bool) $this->enabled;
     }
 
     /**
-     * @param string $mobile
+     * Set adminStatus
+     *
+     * @param boolean $adminStatus
+     *
+     * @return User
      */
-    public function setMobile($mobile)
+    public function setAdminStatus($adminStatus)
     {
-        $this->mobile = $mobile;
+        $this->admin_status = (bool) $adminStatus;
+
+        return $this;
     }
 
     /**
-     * @return string
+     * Get adminStatus
+     *
+     * @return boolean
      */
-    public function getPhone()
+    public function getAdminStatus()
     {
-        return $this->phone;
+        return (bool) $this->admin_status;
+    }
+
+
+    /**
+     * Set activated
+     *
+     * @param boolean $activated
+     *
+     * @return User
+     */
+    public function setActivated($activated)
+    {
+        $this->activated = $activated;
+
+        return $this;
     }
 
     /**
-     * @param string $phone
+     * Get activated
+     *
+     * @return boolean
      */
-    public function setPhone($phone)
+    public function getActivated()
     {
-        $this->phone = $phone;
-    }
-
-    public function getFullName()
-    {
-        return "{ $this->getFirstName() $this->getLastName()}";
-    }
-
-    public function __toString()
-    {
-        return $this->getFullName();
+        return $this->activated;
     }
 }

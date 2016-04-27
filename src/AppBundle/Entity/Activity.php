@@ -4,11 +4,12 @@ namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
+
 /**
  * @ORM\Entity
- * @ORM\Table(name="departments")
+ * @ORM\Table(name="activities")
  */
-class Department
+class Activity
 {
     /**
      * @ORM\Column(type="integer")
@@ -23,6 +24,15 @@ class Department
      * @ORM\Column(type="text", nullable=true, name="name")
      */
     private $name;
+
+    /**
+     * @var \AppBundle\Entity\Contact
+     *
+     *
+     * @ORM\ManyToOne(targetEntity="Contact", inversedBy="activities")
+     * @ORM\JoinColumn(name="contact_id", referencedColumnName="id")
+     */
+    private $contact;
 
     /**
      * @return mixed
@@ -55,6 +65,23 @@ class Department
     {
         $this->name = $name;
     }
+
+    /**
+     * @return Contact
+     */
+    public function getContact()
+    {
+        return $this->contact;
+    }
+
+    /**
+     * @param Contact $contact
+     */
+    public function setContact(Contact $contact)
+    {
+        $this->contact = $contact;
+    }
+
 
     public function __toString()
     {
